@@ -1,6 +1,6 @@
 import numpy as np
 
-img = np.random.randint(0, 256, (5,5,3)) !!! ACHTUNG arbeitet mit zufälliger Indizierung. !!!
+img = np.random.randint(0, 256, (5,5,3)) #!!! ACHTUNG arbeitet mit zufälliger Indizierung. !!!
 y_idx, x_idx = np.meshgrid(np.arange(img.shape[0]), np.arange(img.shape[1]), indexing='ij')
 coords = np.column_stack([x_idx.ravel(), y_idx.ravel()])
 colors = img.reshape(-1,3)
