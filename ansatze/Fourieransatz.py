@@ -1,17 +1,34 @@
 import numpy as np
 
-img = np.random.randint(0, 256, (5,5,3)) # !!! ACHTUNG arbeitet mit zufälliger Indizierung. !!!
-F = [np.fft.fft2(img[:,:,c]) for c in range(3)]
 
-def latex_fourier_ams(N_terms=2):
+def compute_fourier_coeffs(img: np.ndarray):
+    """Berechnet die 2D-FFT pro RGB-Kanal."""
+    return [np.fft.fft2(img[:, :, c].astype(float)) for c in range(3)]
+
+
+def latex_fourier_ams(F, width: int, height: int, n_terms_u: int = 2, n_terms_v: int = 2):
     terms = []
-    for u in range(N_terms):
-        for v in range(N_terms):
-            coef = [F[c][u,v] for c in range(3)]
+    for u in range(min(n_terms_u, height)):
+        for v in range(min(n_terms_v, width)):
+            coef = [F[c][u, v] for c in range(3)]
             a = [np.real(c) for c in coef]
             b = [np.imag(c) for c in coef]
-            term = "\\left(" + ",".join([f"{a[i]:.1f}\\cos(2\\pi({u}x/5+{v}y/5)) - {b[i]:.1f}\\sin(2\\pi({u}x/5+{v}y/5))" for i in range(3)]) + "\\right)"
-            terms.append(term)
+            inside = ",".join(
+                [
+                    (
+                        f"{a[i]:.3f}\\cos(2\\pi({u}x/{width}+{v}y/{height}))"
+                        f" - {b[i]:.3f}\\sin(2\\pi({u}x/{width}+{v}y/{height}))"
+                    )
+                    for i in range(3)
+                ]
+            )
+            terms.append("\\left(" + inside + "\\right)")
+
     return "\\[\n f(x,y) = " + " + ".join(terms) + "\n\\]"
 
-print(latex_fourier_ams())
+
+if __name__ == "__main__":
+    img = np.random.randint(0, 256, (5, 5, 3), dtype=np.uint8)
+    h, w, _ = img.shape
+    F = compute_fourier_coeffs(img)
+    print(latex_fourier_ams(F, width=w, height=h, n_terms_u=2, n_terms_v=2))
